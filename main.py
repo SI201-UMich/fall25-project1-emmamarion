@@ -53,8 +53,63 @@ def load_penguin(file_name):
     return d
             
 def calc_average_flipper_length(penguin_data):
-    pass
+    """Calculates the average flipper length for each sex on each island.
+    
 
+    """
+
+    # Unpack dictionary
+    for penguin_info in penguin_data.items():
+
+        new_d = {}
+        print(penguin_info)
+        # Keep as string to check if NA
+        flipper_length_str = penguin_info.get("flipper_length_mm")
+        sex = penguin_info.get("sex")
+        island = penguin_info.get("island")
+
+        # Skip penguins with missing data
+        if sex == "NA" or flipper_length_str == "NA" or island == "NA": 
+            continue
+        
+        # If island not already in dictionary, add it
+        if island not in new_d:
+            new_d[island] = {}
+
+        # If no data for the sex on this island exists, initalize it
+        if sex not in new_d[island]:
+            new_d[island][sex] = {'total' : 0, 'count' : 0}
+        
+        new_d[island][sex]['total'] += float(flipper_length_str)
+        new_d[island][sex]['count'] += 1
+
+        averages = {}
+        for island, sex_data in new_d.items():
+            averages[island] = {}
+            for sex, data in sex_data.items():
+                avg = data['total'] / data['count']
+                averages[island][sex] = avg
+
+        return averages
+                
+
+        """
+        new_d = {
+            island = {
+                male : {total: 0, count : 0},
+                female : {total: 0, count: 0},
+            }
+
+            island = {
+                male : {total: 0, count : 0},
+                female : {total: 0, count: 0},
+            }
+        }
+        """  
+
+    
+    print(new_d)
+        
 def calculate_chinstrap_percentage(penguin_data):
     pass
 
@@ -65,6 +120,7 @@ def main():
     penguin_dict = load_penguin('penguins.csv')
     # print(penguin_dict) # for debugging
     calc_average_flipper_length(penguin_dict)
+    print(calc_average_flipper_length(penguin_dict)) # for debugging
 
     pass
 
