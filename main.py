@@ -59,10 +59,9 @@ def calc_average_flipper_length(penguin_data):
     """
 
     # Unpack dictionary
-    for penguin_info in penguin_data.items():
+    new_d = {}
+    for id, penguin_info in penguin_data.items():
 
-        new_d = {}
-        print(penguin_info)
         # Keep as string to check if NA
         flipper_length_str = penguin_info.get("flipper_length_mm")
         sex = penguin_info.get("sex")
@@ -80,35 +79,19 @@ def calc_average_flipper_length(penguin_data):
         if sex not in new_d[island]:
             new_d[island][sex] = {'total' : 0, 'count' : 0}
         
+        
         new_d[island][sex]['total'] += float(flipper_length_str)
         new_d[island][sex]['count'] += 1
 
         averages = {}
+        # Unpack the dictionary that we just created
         for island, sex_data in new_d.items():
-            averages[island] = {}
+            averages[island] = {} 
             for sex, data in sex_data.items():
                 avg = data['total'] / data['count']
                 averages[island][sex] = avg
 
-        return averages
-                
-
-        """
-        new_d = {
-            island = {
-                male : {total: 0, count : 0},
-                female : {total: 0, count: 0},
-            }
-
-            island = {
-                male : {total: 0, count : 0},
-                female : {total: 0, count: 0},
-            }
-        }
-        """  
-
-    
-    print(new_d)
+    return averages
         
 def calculate_chinstrap_percentage(penguin_data):
     pass
@@ -118,7 +101,7 @@ def generate_report(flipper_averages, chinstrap_percentage):
 
 def main():
     penguin_dict = load_penguin('penguins.csv')
-    # print(penguin_dict) # for debugging
+    # print(f"PENGUIN DICT: {penguin_dict}") # for debugging
     calc_average_flipper_length(penguin_dict)
     print(calc_average_flipper_length(penguin_dict)) # for debugging
 
