@@ -112,28 +112,30 @@ def calculate_chinstrap_percentage(penguin_data):
     total_body_mass_g = 0
 
     for id, penguin_info in penguin_data.items():
-        # Keep as string to check if NA
-        species = penguin_info.get("species")
-        sex = penguin_info.get("sex")
-        body_mass_g = penguin_info.get("body_mass_g")
-
+        
         # Skip penguins with missing data
-        if sex == "NA" or species == "NA" or body_mass_g == "NA": 
+        # Use .get to avoid saving variables as strings and re-saving them as ints later.
+        if penguin_info.get("sex") == "NA" or penguin_info.get("species") == "NA" or penguin_info.get("body_mass_g") == "NA": 
             continue
         
+        species = penguin_info.get("species")
+        sex = penguin_info.get("sex")
+        body_mass_g = int(penguin_info.get("body_mass_g"))
+
+        body_mass_g = int(body_mass_g)
         # Build a dictionary of only female chinstraps
         if species == "Chinstrap" and sex=="female":
             female_chinstrap_data[id] = {
                 "species" : species,
                 "sex" : sex,
-                "body_mass_g" : int(body_mass_g)
+                "body_mass_g" : body_mass_g
             }
 
             total_body_mass_g += body_mass_g # Increase total body mass
             female_chinstrap_pop += 1 # Increase the total number of female chinstraps
-
-        # Calculate the average body mass of all female chinstraps
-        avg_body_mass_g = total_body_mass_g / female_chinstrap_pop
+        
+    # Calculate the average body mass of all female chinstraps
+    avg_body_mass_g = total_body_mass_g / female_chinstrap_pop
 
     total_female_chinstraps_above_avg = 0
     for id, chinstrap_data in female_chinstrap_data.items():
@@ -141,19 +143,8 @@ def calculate_chinstrap_percentage(penguin_data):
         if chinstrap_data["body_mass_g"] > avg_body_mass_g:
             total_female_chinstraps_above_avg += 1
     
-    (total_female_chinstraps_above_avg / female_chinstrap_pop) * 100
+    return (total_female_chinstraps_above_avg / female_chinstrap_pop) * 100
 
-
-
-
-        
-
-            
-
-        
-    
-
-    pass
  
 
 def generate_report(flipper_averages, chinstrap_percentage):
@@ -164,6 +155,8 @@ def main():
     # print(f"PENGUIN DICT: {penguin_dict}") # for debugging
     calc_average_flipper_length(penguin_dict)
     # print(calc_average_flipper_length(penguin_dict)) # for debugging
+    calculate_chinstrap_percentage(penguin_dict)
+    print(calculate_chinstrap_percentage(penguin_dict)) # for debugging
     
 
     pass
