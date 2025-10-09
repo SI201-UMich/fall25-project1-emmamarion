@@ -54,12 +54,17 @@ def load_penguin(file_name):
             
 def calc_average_flipper_length(penguin_data):
     """Calculates the average flipper length for each sex on each island.
-    
+    Args: 
+        penguin_data (dict): dictionary of penguin data
+
+    Returns:
+        flipper_averages (dict): dictionary of averages per island per sex
 
     """
+    
+    new_d = {}
 
     # Unpack dictionary
-    new_d = {}
     for id, penguin_info in penguin_data.items():
 
         # Keep as string to check if NA
@@ -83,18 +88,73 @@ def calc_average_flipper_length(penguin_data):
         new_d[island][sex]['total'] += float(flipper_length_str)
         new_d[island][sex]['count'] += 1
 
-        averages = {}
+        flipper_averages = {}
         # Unpack the dictionary that we just created
         for island, sex_data in new_d.items():
-            averages[island] = {} 
+            flipper_averages[island] = {} 
             for sex, data in sex_data.items():
                 avg = data['total'] / data['count']
-                averages[island][sex] = avg
+                flipper_averages[island][sex] = avg
 
-    return averages
+    return flipper_averages
         
 def calculate_chinstrap_percentage(penguin_data):
+    """ Calculates the percentage of female Chinstrap penguins with a body mass greater than the average for all female Chinstraps.
+    Args:
+        penguin_data (dict): dictionary of penguin data
+    
+    Returns:
+        chinstrap_percentage (float): calculation as a float
+    """
+
+    female_chinstrap_data = {}
+    female_chinstrap_pop = 0
+    total_body_mass_g = 0
+
+    for id, penguin_info in penguin_data.items():
+        # Keep as string to check if NA
+        species = penguin_info.get("species")
+        sex = penguin_info.get("sex")
+        body_mass_g = penguin_info.get("body_mass_g")
+
+        # Skip penguins with missing data
+        if sex == "NA" or species == "NA" or body_mass_g == "NA": 
+            continue
+        
+        # Build a dictionary of only female chinstraps
+        if species == "Chinstrap" and sex=="female":
+            female_chinstrap_data[id] = {
+                "species" : species,
+                "sex" : sex,
+                "body_mass_g" : int(body_mass_g)
+            }
+
+            total_body_mass_g += body_mass_g # Increase total body mass
+            female_chinstrap_pop += 1 # Increase the total number of female chinstraps
+
+        # Calculate the average body mass of all female chinstraps
+        avg_body_mass_g = total_body_mass_g / female_chinstrap_pop
+
+    total_female_chinstraps_above_avg = 0
+    for id, chinstrap_data in female_chinstrap_data.items():
+        # Check if this chinstrap has an above average body mass
+        if chinstrap_data["body_mass_g"] > avg_body_mass_g:
+            total_female_chinstraps_above_avg += 1
+    
+    (total_female_chinstraps_above_avg / female_chinstrap_pop) * 100
+
+
+
+
+        
+
+            
+
+        
+    
+
     pass
+ 
 
 def generate_report(flipper_averages, chinstrap_percentage):
     pass
@@ -103,7 +163,8 @@ def main():
     penguin_dict = load_penguin('penguins.csv')
     # print(f"PENGUIN DICT: {penguin_dict}") # for debugging
     calc_average_flipper_length(penguin_dict)
-    print(calc_average_flipper_length(penguin_dict)) # for debugging
+    # print(calc_average_flipper_length(penguin_dict)) # for debugging
+    
 
     pass
 
