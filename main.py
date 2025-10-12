@@ -51,7 +51,8 @@ def load_penguin(file_name):
         return f"The file {file_name} was not found"
 
     return d
-            
+
+
 def calc_average_flipper_length(penguin_data):
     """Calculates the average flipper length for each sex on each island.
     Args: 
@@ -97,7 +98,8 @@ def calc_average_flipper_length(penguin_data):
                 flipper_averages[island][sex] = avg
 
     return flipper_averages
-        
+
+
 def calculate_chinstrap_percentage(penguin_data):
     """ Calculates the percentage of female Chinstrap penguins with a body mass greater than the average for all female Chinstraps.
     Args:
@@ -144,22 +146,28 @@ def calculate_chinstrap_percentage(penguin_data):
             total_female_chinstraps_above_avg += 1
     
     return (total_female_chinstraps_above_avg / female_chinstrap_pop) * 100
-
  
 
 def generate_report(flipper_averages, chinstrap_percentage):
+    """ Writes the results from each calculation to a .txt file in a readable format
+    Args:
+        flipper_averages (dict): dictionary of flipper averages
+        chinstrap_percentage (float): number of female chinstrips with an above average body mass
+
+    Returns:
+        none
+    """
     pass
 
 def main():
     penguin_dict = load_penguin('penguins.csv')
     # print(f"PENGUIN DICT: {penguin_dict}") # for debugging
-    calc_average_flipper_length(penguin_dict)
+    flipper_averages = calc_average_flipper_length(penguin_dict)
     # print(calc_average_flipper_length(penguin_dict)) # for debugging
-    calculate_chinstrap_percentage(penguin_dict)
-    print(calculate_chinstrap_percentage(penguin_dict)) # for debugging
-    
+    chinstrap_percentage = calculate_chinstrap_percentage(penguin_dict)
+    # print(calculate_chinstrap_percentage(penguin_dict)) # for debugging
+    generate_report(flipper_averages, chinstrap_percentage)
 
-    pass
 
 if __name__ == "__main__":
     main()
