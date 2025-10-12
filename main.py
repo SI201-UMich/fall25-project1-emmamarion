@@ -90,12 +90,13 @@ def calc_average_flipper_length(penguin_data):
         new_d[island][sex]['count'] += 1
 
         flipper_averages = {}
-        # Unpack the dictionary that we just created
-        for island, sex_data in new_d.items():
-            flipper_averages[island] = {} 
-            for sex, data in sex_data.items():
-                avg = data['total'] / data['count']
-                flipper_averages[island][sex] = avg
+
+    # Unpack the dictionary that we just created
+    for island, sex_data in new_d.items():
+        flipper_averages[island] = {} 
+        for sex, data in sex_data.items():
+            avg = data['total'] / data['count']
+            flipper_averages[island][sex] = avg
 
     return flipper_averages
 
@@ -124,7 +125,6 @@ def calculate_chinstrap_percentage(penguin_data):
         sex = penguin_info.get("sex")
         body_mass_g = int(penguin_info.get("body_mass_g"))
 
-        body_mass_g = int(body_mass_g)
         # Build a dictionary of only female chinstraps
         if species == "Chinstrap" and sex=="female":
             female_chinstrap_data[id] = {
@@ -133,17 +133,19 @@ def calculate_chinstrap_percentage(penguin_data):
                 "body_mass_g" : body_mass_g
             }
 
-            total_body_mass_g += body_mass_g # Increase total body mass
+            total_body_mass_g += body_mass_g # Add total body mass
             female_chinstrap_pop += 1 # Increase the total number of female chinstraps
         
     # Calculate the average body mass of all female chinstraps
     avg_body_mass_g = total_body_mass_g / female_chinstrap_pop
 
     total_female_chinstraps_above_avg = 0
+
+    # Iterate through each female chinstrap
     for id, chinstrap_data in female_chinstrap_data.items():
         # Check if this chinstrap has an above average body mass
         if chinstrap_data["body_mass_g"] > avg_body_mass_g:
-            total_female_chinstraps_above_avg += 1
+            total_female_chinstraps_above_avg += 1  # Add to count
     
     return (total_female_chinstraps_above_avg / female_chinstrap_pop) * 100
  
