@@ -159,7 +159,26 @@ def generate_report(flipper_averages, chinstrap_percentage):
     Returns:
         none
     """
-    pass
+    filename = "penguin_calculations.txt"
+
+    # open .txt file in write mode
+    with open(filename, "w") as f:
+        f.write("Penguin Data Analysis Report\n")
+        f.write("===========================\n\n")
+
+        f.write("Average Flipper Length (mm) by Island and Sex:\n")
+        for island, sex_data in flipper_averages.items():
+            f.write(f"- {island}\n")
+            for sex, avg in sex_data.items():
+                f.write(f"  - {sex.capitalize()}: {avg:.2f} mm\n")
+        
+        f.write("\n")
+        f.write("Chinstrap Penguin Analysis:\n")
+        f.write(f"Percentage of female Chinstraps with above-average body mass: {chinstrap_percentage:.2f}%\n")
+
+
+
+
 
 def main():
     penguin_dict = load_penguin('penguins.csv')
