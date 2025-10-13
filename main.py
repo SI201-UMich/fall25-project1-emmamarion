@@ -1,4 +1,10 @@
-import os
+# Name: Emma Marion
+# Student ID: 63863051
+# Email: emarion@umich.edu
+# Who or what you worked with on this homework (including generative AI like ChatGPT):
+# I worked by myself, and used Gemini to help me debug issues after making a strong attempt myself.
+# I also used it to help me brainstorm test case ideas.
+
 import unittest
 import csv
 
