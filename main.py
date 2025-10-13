@@ -36,6 +36,7 @@ def load_penguin(file_name):
                 sex = row[7]
                 year = row[8]
 
+                # Save everything as a string so we can filter out "NA" values later.
                 d[id] = {
                     headers[1] : species,
                     headers[2] : island,
@@ -62,8 +63,9 @@ def calc_average_flipper_length(penguin_data):
         flipper_averages (dict): dictionary of averages per island per sex
 
     """
-    
+
     new_d = {}
+    flipper_averages = {}
 
     # Unpack dictionary
     for id, penguin_info in penguin_data.items():
@@ -89,7 +91,7 @@ def calc_average_flipper_length(penguin_data):
         new_d[island][sex]['total'] += float(flipper_length_str)
         new_d[island][sex]['count'] += 1
 
-        flipper_averages = {}
+        
 
     # Unpack the dictionary that we just created
     for island, sex_data in new_d.items():
@@ -135,7 +137,10 @@ def calculate_chinstrap_percentage(penguin_data):
 
             total_body_mass_g += body_mass_g # Add total body mass
             female_chinstrap_pop += 1 # Increase the total number of female chinstraps
-        
+    # If no female chinstraps were found, return 0.0
+    if female_chinstrap_pop == 0:
+        return 0.0
+
     # Calculate the average body mass of all female chinstraps
     avg_body_mass_g = total_body_mass_g / female_chinstrap_pop
 
@@ -177,9 +182,6 @@ def generate_report(flipper_averages, chinstrap_percentage):
         f.write(f"Percentage of female Chinstraps with above-average body mass: {chinstrap_percentage:.2f}%\n")
 
 
-
-
-
 def main():
     penguin_dict = load_penguin('penguins.csv')
     # print(f"PENGUIN DICT: {penguin_dict}") # for debugging
@@ -190,5 +192,93 @@ def main():
     generate_report(flipper_averages, chinstrap_percentage)
 
 
+class TestPenguinCalculations(unittest.TestCase):
+    def test_calc_average_flipper_length_general_1(self):
+        """ General test with simple, clean data. """
+        data = {
+            '1': {'species': 'Adelie', 'island': 'Torgersen', 'bill_length_mm': '39.1', 'bill_depth_mm': '18.7', 'flipper_length_mm': '181', 'body_mass_g': '3750', 'sex': 'male', 'year': '2007'},
+            '2': {'species': 'Adelie', 'island': 'Torgersen', 'bill_length_mm': '39.5', 'bill_depth_mm': '17.4', 'flipper_length_mm': '186', 'body_mass_g': '3800', 'sex': 'female', 'year': '2007'},
+            '3': {'species': 'Gentoo', 'island': 'Biscoe', 'bill_length_mm': '46.1', 'bill_depth_mm': '13.2', 'flipper_length_mm': '211', 'body_mass_g': '4500', 'sex': 'female', 'year': '2007'}
+        }
+        result = calc_average_flipper_length(data)
+        self.assertAlmostEqual(result['Torgersen']['male'], 181.0)
+        self.assertAlmostEqual(result['Torgersen']['female'], 186.0)
+        self.assertAlmostEqual(result['Biscoe']['female'], 211.0)
+
+    def test_calc_average_flipper_length_general_2(self):
+        """ General test with multiple penguins per category to test averaging. """
+        data = {
+            '1': {'flipper_length_mm': '180', 'sex': 'male', 'island': 'Torgersen'},
+            '2': {'flipper_length_mm': '190', 'sex': 'male', 'island': 'Torgersen'}, # Avg for Torgersen male = 185
+            '3': {'flipper_length_mm': '210', 'sex': 'female', 'island': 'Biscoe'},
+            '4': {'flipper_length_mm': '220', 'sex': 'female', 'island': 'Biscoe'}  # Avg for Biscoe female = 215
+        }
+        result = calc_average_flipper_length(data)
+        self.assertAlmostEqual(result['Torgersen']['male'], 185.0)
+        self.assertAlmostEqual(result['Biscoe']['female'], 215.0)
+
+    def test_calc_average_flipper_length_edge_empty(self):
+        """ Edge case test with an empty input dictionary. """
+        data = {}
+        result = calc_average_flipper_length(data)
+        self.assertEqual(result, {})
+
+    def test_calc_average_flipper_length_edge_na_values(self):
+        """ Edge case test to ensure 'NA' values are skipped correctly. """
+        data = {
+            '1': {'flipper_length_mm': '180', 'sex': 'male', 'island': 'Torgersen'},
+            '2': {'flipper_length_mm': 'NA', 'sex': 'male', 'island': 'Torgersen'},
+            '3': {'flipper_length_mm': '210', 'sex': 'NA', 'island': 'Biscoe'},
+            '4': {'flipper_length_mm': '220', 'sex': 'female', 'island': 'NA'}
+        }
+        result = calc_average_flipper_length(data)
+        self.assertEqual(result, {'Torgersen': {'male': 180.0}}) # Only the first penguin is valid
+
+    def test_calculate_chinstrap_percentage_general_1(self):
+        """ General test with a simple 50% split. """
+        data = {
+            '1': {'species': 'Chinstrap', 'sex': 'female', 'body_mass_g': '3000'},
+            '2': {'species': 'Chinstrap', 'sex': 'female', 'body_mass_g': '4000'}, # Avg = 3500, this one is above
+            '3': {'species': 'Adelie', 'sex': 'female', 'body_mass_g': '5000'} # Should be ignored
+        }
+        result = calculate_chinstrap_percentage(data)
+        self.assertAlmostEqual(result, 50.0)
+
+    def test_calculate_chinstrap_percentage_general_2(self):
+        """ General test with more varied data. """
+        data = {
+            '1': {'species': 'Chinstrap', 'sex': 'female', 'body_mass_g': '3200'},
+            '2': {'species': 'Chinstrap', 'sex': 'female', 'body_mass_g': '3400'},
+            '3': {'species': 'Chinstrap', 'sex': 'female', 'body_mass_g': '3600'}, # Above avg
+            '4': {'species': 'Chinstrap', 'sex': 'female', 'body_mass_g': '3800'}, # Above avg
+            '5': {'species': 'Chinstrap', 'sex': 'male', 'body_mass_g': '6000'},   # Ignored (male)
+        }
+        # Total mass = 3200+3400+3600+3800 = 14000. Count = 4. Avg = 3500.
+        # Two are above average (3600, 3800).
+        result = calculate_chinstrap_percentage(data)
+        self.assertAlmostEqual(result, 50.0) # (2/4) * 100
+
+    def test_calculate_chinstrap_percentage_edge_no_chinstraps(self):
+        """ Edge case test where no female Chinstraps exist, which could cause a ZeroDivisionError. """
+        data = {
+            '1': {'species': 'Adelie', 'sex': 'female', 'body_mass_g': '3000'},
+            '2': {'species': 'Gentoo', 'sex': 'female', 'body_mass_g': '4000'}
+        }
+        result = calculate_chinstrap_percentage(data)
+        self.assertEqual(result, 0.0)
+
+    def test_calculate_chinstrap_percentage_edge_all_same_mass(self):
+        """ Edge case test where all body masses are identical. """
+        data = {
+            '1': {'species': 'Chinstrap', 'sex': 'female', 'body_mass_g': '3500'},
+            '2': {'species': 'Chinstrap', 'sex': 'female', 'body_mass_g': '3500'}
+        }
+        # The average is 3500. No penguin has a mass > 3500.
+        result = calculate_chinstrap_percentage(data)
+        self.assertAlmostEqual(result, 0.0)
+
+    
+
 if __name__ == "__main__":
-    main()
+    main() # Run calculations and create 
+    unittest.main() # Unittests
