@@ -1,0 +1,16 @@
+Penguin Data Analysis Report
+===========================
+
+Average Flipper Length (mm) by Island and Sex:
+- Torgersen
+  - Male: 194.91 mm
+  - Female: 188.29 mm
+- Biscoe
+  - Female: 205.69 mm
+  - Male: 213.29 mm
+- Dream
+  - Female: 190.02 mm
+  - Male: 196.31 mm
+
+Chinstrap Penguin Analysis:
+Percentage of female Chinstraps with above-average body mass: 50.00%
